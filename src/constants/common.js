@@ -1,0 +1,11 @@
+export const chainId = 17777
+export const nativeToken = 'EOS'
+export const nativeToErc20Token = 'WEOS'
+export const farmToken = 'JLS'
+export const erc20Token1 = 'USDC'
+export const erc20Token2 = 'USDT'
+export const rpc = 'https://api.evm.eosnetwork.com'
+export const explorerHost = 'https://explorer.evm.eosnetwork.com'
+export const tokenSymbol = 'EOS'
+export const chainName = 'EOS'
+export const tokenId = 'eos'
