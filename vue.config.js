@@ -19,7 +19,7 @@ module.exports = {
             .set('public', resolve('public'))
         config.module
             .rule('compile')
-            .test(/\.js$/)
+            .test(/\.mjs$/)
             .include
             .add(path.join(__dirname, './node_modules/_superstruct@1.0.3@superstruct'))
             .add(path.join(__dirname, './node_modules/@metamask'))
