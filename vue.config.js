@@ -17,8 +17,19 @@ module.exports = {
             .set('components', resolve('src/components'))
             .set('views', resolve('src/views'))
             .set('public', resolve('public'))
-        config.module.rule('babel').test(/\.js$/).include
+        config.module
+            .rule('compile')
+            .test(/\.js$/)
+            .include
             .add(path.join(__dirname, './node_modules/_superstruct@1.0.3@superstruct'))
+            .end()
+            .use('babel')
+            .loader('babel-loader')
+            .options({
+                presets: [
+                    ['@babel/preset-env', { modules: false }]
+                ]
+            })
     },
     devServer: {
         // https: true
