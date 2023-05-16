@@ -24,6 +24,9 @@ import walletconnectIcon from '../../assets/walletConnectIcon.svg'
 import walletlinkIcon from '../../assets/coinbaseWalletIcon.svg'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
+import { rpc, chainId } from '../../constants/common.js'
+import { mapActions } from 'pinia'
+import { baseInfoStore } from '../../store/index'
 import Web3 from 'web3'
 export default {
     name: '',
@@ -38,6 +41,10 @@ export default {
         }
     },
     methods: {
+        ...mapActions(baseInfoStore, ['changeProvider', 'changeFromAddress', 'changeNetwork', 'connectWeb3']),
+        show() {
+            this.dialogVisible = true
+        },
         async changeWallet(name) {
             let provider
             if (name === 'metamask') {
@@ -49,20 +56,35 @@ export default {
                 }
             } else if (name === 'walletconnect') {
                 provider = new WalletConnectProvider({
+                    rpc: {
+                        17777: 'https://api.evm.eosnetwork.com'
+                    },
                     infuraId: '07cc32ed1e6ea3a7c35bc159d4251d62'
+
                 })
             } else if (name === 'walletlink') {
                 const walletLink = new CoinbaseWalletSDK({ appName: 'JLSwap', infuraId: '07cc32ed1e6ea3a7c35bc159d4251d62' })
-                provider = walletLink.makeWeb3Provider('https://api.evm.eosnetwork.com', 17777)
+                provider = walletLink.makeWeb3Provider(rpc, chainId)
             }
             if (provider) {
                 try {
                     await provider.enable()
                     const web3 = new Web3(provider)
                     const address = await web3.eth.getAccounts()
-                    const chainId = await web3.eth.getChainId()
-                    console.log(address)
-                    console.log(chainId)
+                    const currentChainId = await web3.eth.getChainId()
+                    if (address) {
+                        this.changeProvider(provider)
+                        this.changeFromAddress(address[0])
+                        if (currentChainId !== chainId) {
+                            console.log('app network err')
+                            // await this.connectWeb3()
+                            // this.changeNetwork(currentChainId)
+                            this.dialogVisible = false
+                        } else {
+                            this.changeNetwork(currentChainId)
+                            this.dialogVisible = false
+                        }
+                    }
                 } catch {
                     console.log('err')
                 }

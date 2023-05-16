@@ -20,6 +20,9 @@ export const baseInfoStore = defineStore('baseInfo', {
         topTvl: '$0.00'
     }),
     actions: {
+        changeProvider(val) {
+            this.provider = val
+        },
         // 获取兑换比例
         async getTokenScale() {
             const web3 = new Web3(this.provider)

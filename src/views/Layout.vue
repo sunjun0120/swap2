@@ -41,7 +41,7 @@
                 <div class="right">
                     <div class="all money">TVL<span class="moneyNum">{{topTvl}}</span></div>
                     <div class="money">JLS<span  class="moneyNum">{{farmTokenPrice}}</span></div>
-                    <div class="connectWallet" @click="connect" v-if="!fromAddress">Connect Wallet</div>
+                    <div class="connectWallet" @click="connectWallet" v-if="!fromAddress">Connect Wallet</div>
                     <div v-else>
                         <div class='userAddress' v-if="network">{{showFrom(fromAddress)}}</div>
                         <div class="connectWallet" v-else>Network Error</div>
@@ -66,7 +66,7 @@
                 </div>
             </el-footer>
         </el-container>
-        <wallet-login></wallet-login>
+        <wallet-login ref="walletLogin"></wallet-login>
     </div>
 </template>
 <script>
@@ -132,6 +132,9 @@ export default {
         },
         goGit() {
             window.open('https://github.com/jlswap')
+        },
+        connectWallet() {
+            this.$refs.walletLogin.show()
         },
         // 获取精度
         getTokenDecimals(val) {
@@ -342,15 +345,15 @@ export default {
                     padding:10px 20px;
                     border-radius: 8px;
                 }
-                .userAddress::after{
-                    display: block;
-                    content: '';
-                    width: 20px;
-                    height: 20px;
-                    background: url('../assets/metaMaskIcon.svg') no-repeat;
-                    background-size: 100% 100%;
-                    margin-left: 8px;
-                }
+                // .userAddress::after{
+                //     display: block;
+                //     content: '';
+                //     width: 20px;
+                //     height: 20px;
+                //     background: url('../assets/metaMaskIcon.svg') no-repeat;
+                //     background-size: 100% 100%;
+                //     margin-left: 8px;
+                // }
             }
         }
         .main{
