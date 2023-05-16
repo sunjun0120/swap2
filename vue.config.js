@@ -6,6 +6,10 @@ function resolve(dir) {
 module.exports = {
     publicPath: process.env.NODE_ENV === 'production' ? '/' : './',
     productionSourceMap: process.env.NODE_ENV !== 'production',
+    // 对node_modules下的文件babel转换
+    transpileDependencies: [
+        /[/\\]node_modules[/\\]_superstruct@1.0.3@superstruct[/\\]/
+    ],
     chainWebpack: config => {
         config.resolve.alias
             .set('@', resolve('src'))

@@ -1,78 +1,72 @@
 <template>
     <div class="jlswap-layout">
-
-                <el-container class="home">
-                    <el-header class="header" height="70px">
-                        <div class="left">
-                            <div class="logoImg">
-                                <img :src="getImg()" alt="">
-                            </div>
-                            <div class="logo">JLSwap</div>
-                            <div class="menus">
-                                <el-menu class="menu"
-                                    :default-active="currentActivePath"
-                                    active-text-color="#0B0B0B"
-                                    text-color="#0B0B0B"
-                                    background-color="transparent"
-                                    mode='horizontal'
-                                    router
-                                    :unique-opened='true'
-                                >
-                                    <template v-for="menu in MenuList">
-                                        <el-submenu :key="menu.menuName" :index="menu.menuName" v-if='menu.children.length > 0' class='topSubmenu'>
-                                            <template slot="title">
-                                                <span slot="title">{{ menu.menuName }}</span>
-                                            </template>
-                                            <el-menu-item v-for="subMenu in menu.children" class='subMenuList'
-                                                :index="subMenu.path"
-                                                :key="subMenu.menuName"
-                                                :route="{ path: subMenu.path }"
-                                            >
-                                                <span class="subMenuTitle">{{ subMenu.menuName }}</span>
-                                            </el-menu-item>
-                                        </el-submenu>
-                                        <el-menu-item :key="menu.path" :index="menu.path" :route="{ path: menu.path }" v-else>
-                                            <span slot="title">{{ menu.menuName }}</span>
-                                        </el-menu-item>
+        <el-container class="home">
+            <el-header class="header" height="70px">
+                <div class="left">
+                    <div class="logoImg">
+                        <img :src="getImg()" alt="">
+                    </div>
+                    <div class="logo">JLSwap</div>
+                    <div class="menus">
+                        <el-menu class="menu"
+                            :default-active="currentActivePath"
+                            active-text-color="#0B0B0B"
+                            text-color="#0B0B0B"
+                            background-color="transparent"
+                            mode='horizontal'
+                            router
+                            :unique-opened='true'
+                        >
+                            <template v-for="menu in MenuList">
+                                <el-submenu :key="menu.menuName" :index="menu.menuName" v-if='menu.children.length > 0' class='topSubmenu'>
+                                    <template slot="title">
+                                        <span slot="title">{{ menu.menuName }}</span>
                                     </template>
-                                </el-menu>
-                            </div>
-                            <div class="bridge" @click="goBridge">Bridge</div>
-                        </div>
-                        <div class="right">
-                            <div class="all money">TVL<span class="moneyNum">{{topTvl}}</span></div>
-                            <div class="money">JLS<span  class="moneyNum">{{farmTokenPrice}}</span></div>
-                            <div class="connectWallet" @click="connect" v-if="!fromAddress">Connect Wallet</div>
-                            <div v-else>
-                                <div class='userAddress' v-if="network">{{showFrom(fromAddress)}}</div>
-                                <div class="connectWallet" v-else>Network Error</div>
-                            </div>
-                            <!-- <WagmiConfig :client='wagmiClient'>
-                                <RainbowKitProvider :chains='chains'>
-                                    <ConnectButton />
-                                </RainbowKitProvider>
-                            </WagmiConfig> -->
-                        </div>
-                    </el-header>
-                    <el-main class="main">
-                        <transition mode="out-in" name="fade">
-                            <router-view></router-view>
-                        </transition>
-                    </el-main>
-                    <el-footer class="footer">
-                        <div class="link">
-                            <el-tooltip class="item" effect="dark" content="coming soon" placement="top">
-                                <div class="linkItem discord"></div>
-                            </el-tooltip>
-                            <el-tooltip class="item" effect="dark" content="coming soon" placement="top">
-                                <div class="linkItem tg"></div>
-                            </el-tooltip>
-                            <div class="linkItem twitter" @click="goTwitter"></div>
-                            <div class="linkItem github" @click="goGit"></div>
-                        </div>
-                    </el-footer>
-                </el-container>
-
+                                    <el-menu-item v-for="subMenu in menu.children" class='subMenuList'
+                                        :index="subMenu.path"
+                                        :key="subMenu.menuName"
+                                        :route="{ path: subMenu.path }"
+                                    >
+                                        <span class="subMenuTitle">{{ subMenu.menuName }}</span>
+                                    </el-menu-item>
+                                </el-submenu>
+                                <el-menu-item :key="menu.path" :index="menu.path" :route="{ path: menu.path }" v-else>
+                                    <span slot="title">{{ menu.menuName }}</span>
+                                </el-menu-item>
+                            </template>
+                        </el-menu>
+                    </div>
+                    <div class="bridge" @click="goBridge">Bridge</div>
+                </div>
+                <div class="right">
+                    <div class="all money">TVL<span class="moneyNum">{{topTvl}}</span></div>
+                    <div class="money">JLS<span  class="moneyNum">{{farmTokenPrice}}</span></div>
+                    <div class="connectWallet" @click="connect" v-if="!fromAddress">Connect Wallet</div>
+                    <div v-else>
+                        <div class='userAddress' v-if="network">{{showFrom(fromAddress)}}</div>
+                        <div class="connectWallet" v-else>Network Error</div>
+                    </div>
+                </div>
+            </el-header>
+            <el-main class="main">
+                <transition mode="out-in" name="fade">
+                    <router-view></router-view>
+                </transition>
+            </el-main>
+            <el-footer class="footer">
+                <div class="link">
+                    <el-tooltip class="item" effect="dark" content="coming soon" placement="top">
+                        <div class="linkItem discord"></div>
+                    </el-tooltip>
+                    <el-tooltip class="item" effect="dark" content="coming soon" placement="top">
+                        <div class="linkItem tg"></div>
+                    </el-tooltip>
+                    <div class="linkItem twitter" @click="goTwitter"></div>
+                    <div class="linkItem github" @click="goGit"></div>
+                </div>
+            </el-footer>
+        </el-container>
+        <wallet-login></wallet-login>
     </div>
 </template>
 <script>
@@ -80,24 +74,11 @@ import { chainId, farmToken } from '../constants/common'
 import Web3 from 'web3'
 import { mapState, mapActions } from 'pinia'
 import { baseInfoStore } from '../store/index'
-import WalletConnectProvider from '@walletconnect/web3-provider'
-// import '@rainbow-me/rainbowkit/styles.css'
-
-// import {
-//     getDefaultWallets,
-//     RainbowKitProvider,
-//     ConnectButton
-// } from '@rainbow-me/rainbowkit'
-
-// import { configureChains, createClient, WagmiConfig } from 'wagmi'
-// import { mainnet, polygon, optimism, arbitrum } from 'wagmi/chains'
-// import { alchemyProvider } from 'wagmi/providers/alchemy'
-// import { publicProvider } from 'wagmi/providers/public'
-
+import WalletLogin from '../components/wallet/login.vue'
 export default {
     name: '',
     components: {
-        // RainbowKitProvider, WagmiConfig, ConnectButton
+        WalletLogin
     },
     data () {
         return {
@@ -256,17 +237,6 @@ export default {
                     }
                 })
             }
-        },
-        async walletconnect() {
-            const provider = new WalletConnectProvider({
-                infuraId: '07cc32ed1e6ea3a7c35bc159d4251d62'
-            })
-            const web3 = new Web3(provider)
-            await provider.enable()
-            const address = await web3.eth.getAccounts()
-            const chainId = await web3.eth.getChainId()
-            console.log(address)
-            console.log(chainId)
         }
     },
     watch: {
