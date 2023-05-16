@@ -22,6 +22,7 @@ module.exports = {
             .test(/\.js$/)
             .include
             .add(path.join(__dirname, './node_modules/_superstruct@1.0.3@superstruct'))
+            .add(path.join(__dirname, './node_modules/@metamask'))
             .end()
             .use('babel')
             .loader('babel-loader')
