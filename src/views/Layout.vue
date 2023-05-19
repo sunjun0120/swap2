@@ -43,7 +43,7 @@
                     <div class="money">JLS<span  class="moneyNum">{{farmTokenPrice}}</span></div>
                     <div class="connectWallet" @click="connectWallet" v-if="!fromAddress">Connect Wallet</div>
                     <div v-else>
-                        <div class='userAddress' v-if="network">{{showFrom(fromAddress)}}</div>
+                        <div class='userAddress' v-if="network" @click="disConnect">{{showFrom(fromAddress)}}</div>
                         <div class="connectWallet" v-else>Network Error</div>
                     </div>
                 </div>
@@ -75,6 +75,7 @@ import Web3 from 'web3'
 import { mapState, mapActions } from 'pinia'
 import { baseInfoStore } from '../store/index'
 import WalletLogin from '../components/wallet/login.vue'
+import Storage from '../utils/storage'
 export default {
     name: '',
     components: {
@@ -135,6 +136,19 @@ export default {
         },
         connectWallet() {
             this.$refs.walletLogin.show()
+        },
+        async disConnect() {
+            if (Storage.load('walletConnectName')) {
+                if (Storage.load('walletConnectName') === 'metamask') {
+                    localStorage.removeItem('walletConnectName')
+                } else {
+                    await this.provider.disconnect()
+                }
+            } else {
+                localStorage.removeItem('walletConnectName')
+            }
+            console.log('退出成功')
+            this.changeFromAddress('')
         },
         // 获取精度
         getTokenDecimals(val) {
@@ -344,6 +358,7 @@ export default {
                     border:1px solid #CE2D32;
                     padding:10px 20px;
                     border-radius: 8px;
+                    cursor: pointer;
                 }
                 // .userAddress::after{
                 //     display: block;

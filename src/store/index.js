@@ -8,6 +8,8 @@ import C from '../constants/contractAddress'
 import { multicallAbi } from '../constants/abi/multicall'
 import { lpList } from '../constants/lpList.js'
 import { tokenList } from '../constants/tokens'
+import WalletConnectProvider from '@walletconnect/web3-provider'
+import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
 
 export const baseInfoStore = defineStore('baseInfo', {
     state: () => ({
@@ -22,6 +24,27 @@ export const baseInfoStore = defineStore('baseInfo', {
     actions: {
         changeProvider(val) {
             this.provider = val
+        },
+        getPorvider() {
+            const name = localStorage.getItem('walletConnectName')
+            if (name === 'metamask') {
+                return window.ethereum
+            } else if (name === 'walletconnect') {
+                const provider0 = new WalletConnectProvider({
+                    rpc: {
+                        17777: 'https://api.evm.eosnetwork.com'
+                    },
+                    infuraId: '07cc32ed1e6ea3a7c35bc159d4251d62'
+
+                })
+                return provider0
+            } else if (name === 'walletlink') {
+                const walletLink = new CoinbaseWalletSDK({ appName: 'JLSwap', infuraId: '07cc32ed1e6ea3a7c35bc159d4251d62' })
+                const provider0 = walletLink.makeWeb3Provider(rpc, chainId)
+                return provider0
+            } else {
+                return null
+            }
         },
         // 获取兑换比例
         async getTokenScale() {
@@ -52,29 +75,6 @@ export const baseInfoStore = defineStore('baseInfo', {
                 const lpValue = token0Balance * token0Price + token1Balance * token1Price
                 tvl = tvl + lpValue
             }
-            // for (const i in this.allLp) {
-            //     // 获取兑换比例
-            //     const scaleContract = new web3.eth.Contract(pairAbi, this.allLp[i].address)
-            //     const reserves = await scaleContract.methods.getReserves().call()
-            //     console.log(reserves)
-            //     // const token2 = await scaleContract.methods.token0().call()
-            //     // const token3 = await scaleContract.methods.token1().call()
-            //     // console.log(token2)
-            //     // console.log(token3)
-            //     const token0 = this.allLp[i].from
-            //     const token1 = this.allLp[i].to
-            //     const decimals0 = this.getTokenDecimals(token0)
-            //     const decimals1 = this.getTokenDecimals(token1)
-            //     const token0Balance = reserves._reserve0 / Math.pow(10, decimals0)
-            //     const token1Balance = reserves._reserve1 / Math.pow(10, decimals1)
-            //     const exchangeRate = token1Balance / token0Balance
-            //     this.allLp[i].scale = exchangeRate
-            //     this.getBaseVal(token0, token1, exchangeRate)
-            //     const token0Price = 1 / this.getTokenPrice(token0)
-            //     const token1Price = 1 / this.getTokenPrice(token1)
-            //     const lpValue = token0Balance * token0Price + token1Balance * token1Price
-            //     tvl = tvl + lpValue
-            // }
             const tvlValue = tvl.toFixed(2).toLocaleString()
             this.topTvl = '$' + tvlValue
         },

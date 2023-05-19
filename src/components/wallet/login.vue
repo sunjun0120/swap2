@@ -27,6 +27,7 @@ import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
 import { rpc, chainId } from '../../constants/common.js'
 import { mapActions } from 'pinia'
 import { baseInfoStore } from '../../store/index'
+import Storage from '../../utils/storage'
 import Web3 from 'web3'
 export default {
     name: '',
@@ -50,7 +51,7 @@ export default {
             if (name === 'metamask') {
                 const { ethereum } = window
                 if (ethereum && ethereum.isMetaMask) {
-                    provider = ethereum
+                    provider = window.ethereum
                 } else {
                     window.open('https://metamask.io/')
                 }
@@ -82,6 +83,8 @@ export default {
                             this.dialogVisible = false
                         } else {
                             this.changeNetwork(currentChainId)
+                            Storage.put('walletConnectName', name)
+                            localStorage.setItem('walletConnectName', name)
                             this.dialogVisible = false
                         }
                     }
