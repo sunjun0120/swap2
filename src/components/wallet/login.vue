@@ -30,7 +30,7 @@ import { baseInfoStore } from '../../store/index'
 import Storage from '../../utils/storage'
 import Web3 from 'web3'
 export default {
-    name: '',
+    name: 'walletLogin',
     data () {
         return {
             dialogVisible: false,
@@ -42,7 +42,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(baseInfoStore, ['changeProvider', 'changeFromAddress', 'changeNetwork', 'connectWeb3']),
+        ...mapActions(baseInfoStore, ['changeProvider', 'changeFromAddress', 'changeNetwork', 'connectWeb3', 'changeInit']),
         show() {
             this.dialogVisible = true
         },
@@ -73,6 +73,7 @@ export default {
                     const web3 = new Web3(provider)
                     const address = await web3.eth.getAccounts()
                     const currentChainId = await web3.eth.getChainId()
+                    console.log(currentChainId)
                     if (address) {
                         this.changeProvider(provider)
                         this.changeFromAddress(address[0])
@@ -80,11 +81,13 @@ export default {
                             console.log('app network err')
                             // await this.connectWeb3()
                             // this.changeNetwork(currentChainId)
+                            this.changeNetwork(false)
                             this.dialogVisible = false
                         } else {
-                            this.changeNetwork(currentChainId)
+                            this.changeNetwork(true)
                             Storage.put('walletConnectName', name)
                             localStorage.setItem('walletConnectName', name)
+                            this.changeInit()
                             this.dialogVisible = false
                         }
                     }

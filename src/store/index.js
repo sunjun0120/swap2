@@ -19,9 +19,13 @@ export const baseInfoStore = defineStore('baseInfo', {
         allLp: lpList,
         allToken: tokenList,
         provider: window.ethereum,
-        topTvl: '$0.00'
+        topTvl: '$0.00',
+        initShow: false
     }),
     actions: {
+        changeInit() {
+            this.initShow = !this.initShow
+        },
         changeProvider(val) {
             this.provider = val
         },

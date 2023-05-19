@@ -50,7 +50,7 @@
                 <div class='connectWallet' v-else>Network Error</div>
             </div>
             <div class='loginState' v-else>
-                <div class='connectWallet'  @click='connect'>Connect Wallet</div>
+                <div class='connectWallet'  @click='connectWallet'>Connect Wallet</div>
             </div>
 
         </div>
@@ -59,6 +59,7 @@
         <confirm-wait ref="confirmWait"></confirm-wait>
         <confirm-success ref="confirmSuccess"></confirm-success>
         <confirm-fail ref="confirmFail"></confirm-fail>
+        <wallet-login ref="walletLogin"></wallet-login>
     </div>
 </template>
 <script>
@@ -74,10 +75,11 @@ import PoolRemove from '../components/pool/poolRemove.vue'
 import ConfirmWait from '../components/swap/waitDia.vue'
 import ConfirmSuccess from '../components/swap/success.vue'
 import ConfirmFail from '../components/swap/fail.vue'
+import WalletLogin from '../components/wallet/login.vue'
 export default {
     name: '',
     components: {
-        PoolAdd, PoolRemove, ConfirmWait, ConfirmSuccess, ConfirmFail
+        PoolAdd, PoolRemove, ConfirmWait, ConfirmSuccess, ConfirmFail, WalletLogin
     },
     data () {
         return {
@@ -88,13 +90,16 @@ export default {
         }
     },
     computed: {
-        ...mapState(baseInfoStore, ['fromAddress', 'network', 'allToken', 'allLp', 'provider'])
+        ...mapState(baseInfoStore, ['fromAddress', 'network', 'allToken', 'allLp', 'provider', 'initShow'])
     },
     methods: {
-        ...mapActions(baseInfoStore, ['changeFromAddress', 'changeNetwork', 'connect']),
+        ...mapActions(baseInfoStore, ['changeFromAddress', 'changeNetwork']),
         goback() {
             this.showAdd = 0
             this.init()
+        },
+        connectWallet() {
+            this.$refs.walletLogin.show()
         },
         addPool() {
             this.$refs.poolAdd.show('', '')
@@ -329,6 +334,13 @@ export default {
         this.init()
         this.onChangeAccount()
         this.onChangeChain()
+    },
+    watch: {
+        initShow(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.init()
+            }
+        }
     }
 }
 </script>

@@ -112,7 +112,7 @@ export default {
         }
     },
     computed: {
-        ...mapState(baseInfoStore, ['fromAddress', 'network', 'allToken', 'allLp', 'topTvl', 'provider']),
+        ...mapState(baseInfoStore, ['fromAddress', 'network', 'allToken', 'allLp', 'topTvl', 'provider', 'initShow']),
         currentActivePath () {
             const path = this.$route.path
             const params = this.$route.params
@@ -267,6 +267,11 @@ export default {
             if (!newVal) {
                 this.farmTokenPrice = '$0.00'
                 this.all = '$0.00'
+            }
+        },
+        initShow(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.init()
             }
         }
     },

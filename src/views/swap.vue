@@ -137,6 +137,7 @@
         <confirm-success ref="confirmSuccess"></confirm-success>
         <confirm-fail ref="confirmFail"></confirm-fail>
         <change-token ref="changeToken" @changeToken1='changeToken1' @changeToken2='changeToken2'></change-token>
+        <wallet-login ref="walletLogin"></wallet-login>
     </div>
 </template>
 <script>
@@ -146,7 +147,7 @@ import ConfirmWait from '../components/swap/waitDia.vue'
 import ConfirmSuccess from '../components/swap/success.vue'
 import ConfirmFail from '../components/swap/fail.vue'
 import ChangeToken from '../components/swap/changeToken.vue'
-
+import WalletLogin from '../components/wallet/login.vue'
 import { mapState, mapActions } from 'pinia'
 import { baseInfoStore } from '../store/index'
 
@@ -154,10 +155,11 @@ import { ERC20 } from '../constants/abi/ERC20'
 import { routerAbi } from '../constants/abi/routerAbi'
 import { wchainAbi } from '../constants/abi/wchainAbi'
 import C from '../constants/contractAddress'
+
 export default {
     name: '',
     components: {
-        ConfirmWait, ConfirmSuccess, ConfirmFail, ChangeToken
+        ConfirmWait, ConfirmSuccess, ConfirmFail, ChangeToken, WalletLogin
     },
     data () {
         return {
@@ -183,7 +185,7 @@ export default {
         }
     },
     computed: {
-        ...mapState(baseInfoStore, ['fromAddress', 'network', 'allToken', 'provider']),
+        ...mapState(baseInfoStore, ['fromAddress', 'network', 'allToken', 'provider', 'initShow']),
         showError() {
             if (this.tokenVal1 && Number(this.tokenVal1) !== 0 && (this.tokenVal1 <= this.balance1) && this.tokenVal2) {
                 return false
@@ -193,9 +195,10 @@ export default {
         }
     },
     methods: {
-        ...mapActions(baseInfoStore, ['changeFromAddress', 'changeNetwork', 'connect', 'connectWeb3', 'aggregateBalance']),
+        ...mapActions(baseInfoStore, ['changeFromAddress', 'changeNetwork', 'connectWeb3', 'aggregateBalance']),
         connectWallet() {
-            this.connect()
+            // this.connect()
+            this.$refs.walletLogin.show()
         },
         async changeToken(val) {
             if (val === 1) {
@@ -1135,6 +1138,11 @@ export default {
         settings(newV, oldV) {
             if (newV !== 0.1) {
                 this.showAuto = false
+            }
+        },
+        initShow(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.init()
             }
         }
     }

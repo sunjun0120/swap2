@@ -78,12 +78,13 @@
                     </div>
                     <div class='connect' v-else>
                         <div class='connectTip'>Connect to a Wallet to start farm</div>
-                        <div class='connectBtn' @click="connect">Connect Wallet</div>
+                        <div class='connectBtn' @click="connectWallet">Connect Wallet</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <wallet-login ref="walletLogin"></wallet-login>
   </div>
 </template>
 
@@ -96,8 +97,12 @@ import { pairAbi } from '../../constants/abi/pairAbi'
 import { farmAbi } from '../../constants/abi/farmAbi'
 import { multicallAbi } from '../../constants/abi/multicall'
 import C from '../../constants/contractAddress'
+import WalletLogin from '../wallet/login.vue'
 export default {
     name: '',
+    components: {
+        WalletLogin
+    },
     data () {
         return {
             chainId: chainId,
@@ -105,16 +110,19 @@ export default {
         }
     },
     computed: {
-        ...mapState(baseInfoStore, ['fromAddress', 'network', 'allToken', 'allLp', 'provider'])
+        ...mapState(baseInfoStore, ['fromAddress', 'network', 'allToken', 'allLp', 'provider', 'initShow'])
     },
     methods: {
-        ...mapActions(baseInfoStore, ['changeFromAddress', 'changeNetwork', 'connect', 'getBaseVal', 'connectWeb3']),
+        ...mapActions(baseInfoStore, ['changeFromAddress', 'changeNetwork', 'getBaseVal', 'connectWeb3']),
         getImg(val) {
             for (const i in this.allToken) {
                 if (this.allToken[i].name === val) {
                     return this.allToken[i].icon
                 }
             }
+        },
+        connectWallet() {
+            this.$refs.walletLogin.show()
         },
         openOrClose(index) {
             for (const i in this.allLp) {
@@ -834,6 +842,13 @@ export default {
         this.init()
         this.onChangeAccount()
         this.onChangeChain()
+    },
+    watch: {
+        initShow(newVal, oldVal) {
+            if (newVal !== oldVal) {
+                this.init()
+            }
+        }
     },
     beforeDestroy() {
         for (const i in this.allLp) {
