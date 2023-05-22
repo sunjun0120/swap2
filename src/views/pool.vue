@@ -345,6 +345,12 @@ export default {
             if (newVal) {
                 this.init()
             }
+        },
+        provider(newVal, oldVal) {
+            if (newVal) {
+                this.onChangeAccount()
+                this.onChangeChain()
+            }
         }
     }
 }
