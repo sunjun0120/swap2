@@ -43,7 +43,16 @@
                     <div class="money">JLS<span  class="moneyNum">{{farmTokenPrice}}</span></div>
                     <div class="connectWallet" @click="connectWallet" v-if="!fromAddress">Connect Wallet</div>
                     <div v-else>
-                        <div class='userAddress' v-if="network" @click="disConnect">{{showFrom(fromAddress)}}</div>
+                        <el-popover  v-if="network"
+                            placement="bottom"
+                            title=""
+                            width=""
+                            popper-class="logout"
+                            trigger="hover"
+                            content="">
+                            <div class='userAddress' slot="reference">{{showFrom(fromAddress)}}</div>
+                            <div @click="disConnect" class="logoutBt">Logout</div>
+                        </el-popover>
                         <div class="connectWallet" v-else>Network Error</div>
                     </div>
                 </div>
@@ -75,7 +84,7 @@ import Web3 from 'web3'
 import { mapState, mapActions } from 'pinia'
 import { baseInfoStore } from '../store/index'
 import WalletLogin from '../components/wallet/login.vue'
-import Storage from '../utils/storage'
+import Local from '../utils/local'
 export default {
     name: '',
     components: {
@@ -138,17 +147,12 @@ export default {
             this.$refs.walletLogin.show()
         },
         async disConnect() {
-            if (Storage.load('walletConnectName')) {
-                if (Storage.load('walletConnectName') === 'metamask') {
-                    localStorage.removeItem('walletConnectName')
-                } else {
-                    await this.provider.disconnect()
-                }
-            } else {
-                localStorage.removeItem('walletConnectName')
+            if (Local.load('walletConnectName') !== 'metamask') {
+                await this.provider.disconnect()
             }
-            console.log('退出成功')
+            Local.remove('walletConnectName')
             this.changeFromAddress('')
+            console.log('退出成功')
         },
         // 获取精度
         getTokenDecimals(val) {
@@ -201,8 +205,8 @@ export default {
         async init() {
             // 初始化
             const web3 = new Web3(this.provider)
-            const accountAddress = await web3.eth.getAccounts()
-            this.changeFromAddress(accountAddress[0])
+            // const accountAddress = await web3.eth.getAccounts()
+            // this.changeFromAddress(accountAddress[0])
             if (this.fromAddress) {
                 const chainAddress = await web3.eth.getChainId()
                 if (chainAddress.toString() === this.chainId.toString()) {
@@ -261,24 +265,27 @@ export default {
             if (!newVal) {
                 this.farmTokenPrice = '$0.00'
                 this.all = '$0.00'
+            } else {
+                this.init()
             }
         },
         network(newVal, oldVal) {
             if (!newVal) {
                 this.farmTokenPrice = '$0.00'
                 this.all = '$0.00'
+            } else {
+                this.init()
             }
         },
-        initShow(newVal, oldVal) {
-            if (newVal !== oldVal) {
-                this.init()
+        provider(newVal, oldVal) {
+            if (newVal) {
+                this.onChangeAccount()
+                this.onChangeChain()
             }
         }
     },
     mounted () {
         this.init()
-        this.onChangeAccount()
-        this.onChangeChain()
     }
 }
 </script>
@@ -485,5 +492,15 @@ export default {
 .fade-enter,
 .fade-leave-to {
     opacity: 0;
+}
+.logout{
+    min-width: 50px!important;
+    padding:0!important;
+    .logoutBt{
+        padding:12px;
+        cursor: pointer;
+        // font-weight: bold;
+        color: #000000;
+    }
 }
 </style>

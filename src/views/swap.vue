@@ -1067,8 +1067,8 @@ export default {
             // 获取兑换比例
             if (this.provider) {
                 const web3 = new Web3(this.provider)
-                const accountAddress = await web3.eth.getAccounts()
-                this.changeFromAddress(accountAddress[0])
+                // const accountAddress = await web3.eth.getAccounts()
+                // this.changeFromAddress(accountAddress[0])
                 if (this.fromAddress) {
                     const chainAddress = await web3.eth.getChainId()
                     if (chainAddress.toString() === this.chainId.toString()) {
@@ -1125,7 +1125,7 @@ export default {
                 }
             } else {
                 this.initInfo()
-                console.log('请安装MetaMask钱包')
+                // console.log('请安装MetaMask钱包')
             }
         }
     },
@@ -1140,9 +1140,23 @@ export default {
                 this.showAuto = false
             }
         },
-        initShow(newVal, oldVal) {
-            if (newVal !== oldVal) {
+        fromAddress(newVal, oldVal) {
+            if (newVal) {
                 this.init()
+            }
+        },
+        network: {
+            handler(newVal, oldVal) {
+                if (newVal) {
+                    this.init()
+                }
+            },
+            immediate: true // 立即执行
+        },
+        provider(newVal, oldVal) {
+            if (newVal) {
+                this.onChangeAccount()
+                this.onChangeChain()
             }
         }
     }

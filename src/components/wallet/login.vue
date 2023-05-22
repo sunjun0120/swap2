@@ -25,9 +25,9 @@ import walletlinkIcon from '../../assets/coinbaseWalletIcon.svg'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
 import { rpc, chainId } from '../../constants/common.js'
-import { mapActions } from 'pinia'
+import { mapState, mapActions } from 'pinia'
 import { baseInfoStore } from '../../store/index'
-import Storage from '../../utils/storage'
+import Local from '../../utils/local'
 import Web3 from 'web3'
 export default {
     name: 'walletLogin',
@@ -41,22 +41,26 @@ export default {
             ]
         }
     },
+    computed: {
+        ...mapState(baseInfoStore, ['provider'])
+    },
     methods: {
         ...mapActions(baseInfoStore, ['changeProvider', 'changeFromAddress', 'changeNetwork', 'connectWeb3', 'changeInit']),
         show() {
             this.dialogVisible = true
         },
-        async changeWallet(name) {
-            let provider
+        async autoConnect() {
+            const name = Local.load('walletConnectName')
+            let provider0
             if (name === 'metamask') {
                 const { ethereum } = window
                 if (ethereum && ethereum.isMetaMask) {
-                    provider = window.ethereum
+                    provider0 = window.ethereum
                 } else {
                     window.open('https://metamask.io/')
                 }
             } else if (name === 'walletconnect') {
-                provider = new WalletConnectProvider({
+                provider0 = new WalletConnectProvider({
                     rpc: {
                         17777: 'https://api.evm.eosnetwork.com'
                     },
@@ -65,29 +69,26 @@ export default {
                 })
             } else if (name === 'walletlink') {
                 const walletLink = new CoinbaseWalletSDK({ appName: 'JLSwap', infuraId: '07cc32ed1e6ea3a7c35bc159d4251d62' })
-                provider = walletLink.makeWeb3Provider(rpc, chainId)
+                provider0 = walletLink.makeWeb3Provider(rpc, chainId)
             }
-            if (provider) {
+            if (provider0) {
                 try {
-                    await provider.enable()
-                    const web3 = new Web3(provider)
+                    await provider0.enable()
+                    const web3 = new Web3(provider0)
                     const address = await web3.eth.getAccounts()
                     const currentChainId = await web3.eth.getChainId()
-                    console.log(currentChainId)
                     if (address) {
-                        this.changeProvider(provider)
+                        await this.changeProvider(provider0)
+                        this.onChangeAccount()
+                        this.onChangeChain()
                         this.changeFromAddress(address[0])
                         if (currentChainId !== chainId) {
                             console.log('app network err')
-                            // await this.connectWeb3()
-                            // this.changeNetwork(currentChainId)
                             this.changeNetwork(false)
                             this.dialogVisible = false
                         } else {
+                            Local.put('walletConnectName', name)
                             this.changeNetwork(true)
-                            Storage.put('walletConnectName', name)
-                            localStorage.setItem('walletConnectName', name)
-                            this.changeInit()
                             this.dialogVisible = false
                         }
                     }
@@ -95,7 +96,82 @@ export default {
                     console.log('err')
                 }
             }
+        },
+        async changeWallet(name) {
+            let provider0
+            if (name === 'metamask') {
+                const { ethereum } = window
+                if (ethereum && ethereum.isMetaMask) {
+                    provider0 = window.ethereum
+                } else {
+                    window.open('https://metamask.io/')
+                }
+            } else if (name === 'walletconnect') {
+                provider0 = new WalletConnectProvider({
+                    rpc: {
+                        17777: 'https://api.evm.eosnetwork.com'
+                    },
+                    infuraId: 'e38d305ad916e7786028bd8e8b2db1c2'
+
+                })
+            } else if (name === 'walletlink') {
+                const walletLink = new CoinbaseWalletSDK({ appName: 'JLSwap', infuraId: 'e38d305ad916e7786028bd8e8b2db1c2' })
+                provider0 = walletLink.makeWeb3Provider(rpc, chainId)
+            }
+
+            try {
+                await provider0.enable()
+                const web3 = new Web3(provider0)
+                const address = await web3.eth.getAccounts()
+                const currentChainId = await web3.eth.getChainId()
+                if (address) {
+                    await this.changeProvider(provider0)
+                    this.onChangeAccount()
+                    this.onChangeChain()
+                    this.changeFromAddress(address[0])
+                    if (currentChainId !== chainId) {
+                        // await provider0.disconnect()
+                        console.log('app network err')
+                        this.changeNetwork(false)
+                        this.dialogVisible = false
+                    } else {
+                        this.changeNetwork(true)
+                        Local.put('walletConnectName', name)
+                        this.dialogVisible = false
+                    }
+                }
+            } catch {
+                console.log('err')
+            }
+        },
+        // 监听账户切换
+        onChangeAccount() {
+            if (this.provider) {
+                const that = this
+                this.provider.on('accountsChanged', function(res) {
+                    console.log('用户改变')
+                    that.changeFromAddress(res[0])
+                })
+            }
+        },
+        // 监听链是否正确
+        onChangeChain() {
+            if (this.provider) {
+                const that = this
+                this.provider.on('chainChanged', function(val) {
+                    const chainId = Web3.utils.numberToHex(that.chainId)
+                    if (val !== chainId) {
+                        that.changeNetwork(false)
+                    } else {
+                        console.log('chain正确')
+                        that.changeNetwork(true)
+                    }
+                })
+            }
         }
+    },
+    created () {
+        this.autoConnect()
     }
 }
 </script>

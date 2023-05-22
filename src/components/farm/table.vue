@@ -811,8 +811,8 @@ export default {
         async init() {
             if (this.provider) {
                 const web3 = new Web3(this.provider)
-                const accountAddress = await web3.eth.getAccounts()
-                this.changeFromAddress(accountAddress[0])
+                // const accountAddress = await web3.eth.getAccounts()
+                // this.changeFromAddress(accountAddress[0])
                 if (this.fromAddress) {
                     const chainAddress = await web3.eth.getChainId()
                     if (chainAddress.toString() === this.chainId.toString()) {
@@ -844,8 +844,13 @@ export default {
         this.onChangeChain()
     },
     watch: {
-        initShow(newVal, oldVal) {
-            if (newVal !== oldVal) {
+        fromAddress(newVal, oldVal) {
+            if (newVal) {
+                this.init()
+            }
+        },
+        network(newVal, oldVal) {
+            if (newVal) {
                 this.init()
             }
         }

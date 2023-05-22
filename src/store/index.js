@@ -18,7 +18,7 @@ export const baseInfoStore = defineStore('baseInfo', {
         chainId: chainId,
         allLp: lpList,
         allToken: tokenList,
-        provider: window.ethereum,
+        provider: null,
         topTvl: '$0.00',
         initShow: false
     }),
